@@ -1,6 +1,6 @@
 Gem::Specification.new do |gem|
   gem.name = "tor-privoxy"
-  gem.version = "0.1.1"
+  gem.version = "0.1.2"
   gem.description = "Mechanize wrapper to work via Tor/Privoxy with endpoint switching ability"
   gem.summary = gem.description
   gem.authors = ["Phil Pirozhkov"]
@@ -15,5 +15,7 @@ Gem::Specification.new do |gem|
     ]
 
   gem.add_dependency 'mechanize'
+  gem.add_dependency 'capybara'
+  gem.add_dependency 'capybara-webkit'
 end
 

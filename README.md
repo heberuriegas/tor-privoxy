@@ -19,7 +19,7 @@ To use in your application:
 Create a wrapper and you get a Mechanize instance wrapped to use Tor and
 which is able to use another endpoint when gets HTTP 4xx
 
-    agent ||= TorPrivoxy::Agent.new '127.0.0.1', '', {8123 => 9051} do |agent|
+    agent ||= TorPrivoxy::Agent.new host: '127.0.0.1', password: '', privoxy_port: 8123, control_port: 9051 do |agent|
       sleep 10
       puts "New IP is #{agent.ip}"
     end
@@ -35,6 +35,11 @@ Configuration options are passed when creating an agent, and consists of:
  - password for Tor Control
  - a hash of Privoxy port => Tor port
  - a block which is called when agent switches to a new endpoint
+
+### Capybara configuration
+Capybara Selenium and Capybara Webkit are override if is true in the initializer
+
+    agent ||= TorPrivoxy::Agent.new host: privoxy_port: 8123, capybara: true
 
 ## Author
 

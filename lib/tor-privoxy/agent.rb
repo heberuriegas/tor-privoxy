@@ -1,13 +1,34 @@
 require 'net/telnet'
 require 'mechanize'
+require 'capybara'
+require 'capybara-webkit'
 
 module TorPrivoxy
   class Agent
-    def initialize host, pass, control, &callback
-      @proxy = Switcher.new host, pass, control
+    def initialize options={} , &callback
+      options.reverse_merge!(host: '127.0.0.1', password: '', privoxy_port: 8118, control_port: 9051, capybara: false)
+      @proxy = Switcher.new(options[:host], options[:password], { options[:privoxy_port] => options[:control_port] })
+      
       @mechanize = Mechanize.new
-      @mechanize.set_proxy(@proxy.host, @proxy.port)
-      @circuit_timeout = 10
+      @capybara = options[:capybara]
+
+      if @capybara == true
+        @selenium_profile = Selenium::WebDriver::Firefox::Profile.new
+        @webkit_browser = Capybara::Webkit::Browser.new(Capybara::Webkit::Connection.new)
+      end
+
+      set_proxy_in_clients
+
+      if @capybara == true
+        Capybara.register_driver :selenium do |app|
+          Capybara::Selenium::Driver.new(app, :profile => @selenium_profile)
+        end
+
+        Capybara.register_driver :webkit do |app|
+          Capybara::Webkit::Driver.new(app, browser: @webkit_browser)
+        end
+      end
+
       @callback = callback
       @callback.call self
     end
@@ -29,10 +50,22 @@ module TorPrivoxy
       localhost.close
 
       @proxy.next
-      @mechanize = Mechanize.new
-      @mechanize.set_proxy(@proxy.host, @proxy.port)
+      
+      set_proxy_in_clients
 
       @callback.call self
+    end
+
+    def set_proxy_in_clients
+      @mechanize.set_proxy(@proxy.host, @proxy.port)
+
+      if @capybara == true
+        @selenium_profile["network.proxy.type"] = 1 # manual proxy config
+        @selenium_profile["network.proxy.http_port"] = @proxy.host
+        @selenium_profile["network.proxy.http_port"] = @proxy.port
+
+        @webkit_browser.set_proxy(host: @proxy.host, port: @proxy.port)
+      end
     end
 
     def ip

@@ -6,7 +6,7 @@ require 'capybara-webkit'
 module TorPrivoxy
   class Agent
     def initialize options={} , &callback
-      options.reverse_merge!(host: '127.0.0.1', password: '', privoxy_port: 8118, control_port: 9051, capybara: false)
+      options.reverse_merge!(host: '127.0.0.1', password: '', privoxy_port: 8123, control_port: 9051, capybara: false)
       @proxy = Switcher.new(options[:host], options[:password], { options[:privoxy_port] => options[:control_port] })
       
       @mechanize = Mechanize.new

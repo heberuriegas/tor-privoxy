@@ -1,4 +1,4 @@
-# Tor/Privoxy wrapped Mechanize
+# Tor/Privoxy wrapped Mechanize and Capybara
 
 Tor-privoxy is a Ruby Mechanize wrapper to access the web with via Tor/Privoxy
 It allows to use multiple Privoxy instances, switch endpoints, switch

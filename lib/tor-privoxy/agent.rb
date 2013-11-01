@@ -57,14 +57,14 @@ module TorPrivoxy
     end
 
     def set_proxy_in_clients
-      @mechanize.set_proxy(@proxy.host, @proxy.port)
+      @mechanize.set_proxy(@proxy.host, @proxy.port.to_i)
 
       if @capybara == true
         @selenium_profile["network.proxy.type"] = 1 # manual proxy config
-        @selenium_profile["network.proxy.http_port"] = @proxy.host
-        @selenium_profile["network.proxy.http_port"] = @proxy.port
+        @selenium_profile["network.proxy.http"] = @proxy.host
+        @selenium_profile["network.proxy.http_port"] = @proxy.port.to_i
 
-        @webkit_browser.set_proxy(host: @proxy.host, port: @proxy.port)
+        @webkit_browser.set_proxy(host: @proxy.host, port: @proxy.port.to_i)
       end
     end
 

@@ -4,7 +4,7 @@ require 'capybara'
 begin
   require 'capybara-webkit'
 rescue LoadError => e
-  puts 'Warning: Webkit is not loaded.'
+  
 end
 
 module TorPrivoxy

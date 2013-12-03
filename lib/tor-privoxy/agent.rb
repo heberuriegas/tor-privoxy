@@ -1,7 +1,11 @@
 require 'net/telnet'
 require 'mechanize'
 require 'capybara'
-require 'capybara-webkit'
+begin
+  require 'capybara-webkit'
+rescue LoadError => e
+  puts 'Warning: Webkit is not loaded.'
+end
 
 module TorPrivoxy
   class Agent
@@ -14,7 +18,7 @@ module TorPrivoxy
 
       if @capybara == true
         @selenium_profile = Selenium::WebDriver::Firefox::Profile.new
-        @webkit_browser = Capybara::Webkit::Browser.new(Capybara::Webkit::Connection.new)
+        @webkit_browser = defined?(Capybara::Webkit).nil? ? nil : Capybara::Webkit::Browser.new(Capybara::Webkit::Connection.new)
       end
 
       set_proxy_in_clients
@@ -26,7 +30,7 @@ module TorPrivoxy
 
         Capybara.register_driver :webkit do |app|
           Capybara::Webkit::Driver.new(app, browser: @webkit_browser)
-        end
+        end unless @webkit_browser.nil?
       end
 
       @callback = callback
@@ -64,7 +68,7 @@ module TorPrivoxy
         @selenium_profile["network.proxy.http"] = @proxy.host
         @selenium_profile["network.proxy.http_port"] = @proxy.port.to_i
 
-        @webkit_browser.set_proxy(host: @proxy.host, port: @proxy.port.to_i)
+        @webkit_browser.set_proxy(host: @proxy.host, port: @proxy.port.to_i) unless @webkit_browser.nil?
       end
     end
 

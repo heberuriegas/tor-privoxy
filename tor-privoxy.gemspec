@@ -16,6 +16,5 @@ Gem::Specification.new do |gem|
 
   gem.add_dependency 'mechanize'
   gem.add_dependency 'capybara'
-  gem.add_dependency 'capybara-webkit'
 end
 

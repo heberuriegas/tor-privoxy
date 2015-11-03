@@ -66,6 +66,7 @@ module TorPrivoxy
       if @capybara == true
         @selenium_profile["network.proxy.type"] = 1
         @selenium_profile["network.proxy.http"] = @proxy.host
+        @selenium_profile["network.proxy.ssl"] = @proxy.host
         @selenium_profile["network.proxy.http_port"] = @proxy.port.to_i
 
         @webkit_browser.set_proxy(host: @proxy.host, port: @proxy.port.to_i) unless @webkit_browser.nil?

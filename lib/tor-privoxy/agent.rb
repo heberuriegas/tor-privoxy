@@ -9,9 +9,10 @@ end
 
 module TorPrivoxy
   class Agent
-    def initialize options={} , &callback
-      options.reverse_merge!(host: '127.0.0.1', password: '', control: { 8118 => 9051 }, capybara: false)
-      @proxy = Switcher.new(options[:host], options[:password], options[:control])
+    def initialize privoxy_data = [{ host: '127.0.0.1', password: '', privoxy_port: 8118, control_port: 9051 }], options = {}, &callback
+      privoxy_data = [privoxy_data] unless privoxy_data.is_a?(Array)
+      options.reverse_merge!(capybara: false)
+      @proxy = Switcher.new(privoxy_data)
       @capybara = options[:capybara]
       
       @mechanize = Mechanize.new
@@ -39,7 +40,7 @@ module TorPrivoxy
     def switch_circuit
       localhost = Net::Telnet::new('Host' => @proxy.host, 'Port' => @proxy.control_port,
                                  'Timeout' => @circuit_timeout, 'Prompt' => /250 OK\n/)
-      localhost.cmd("AUTHENTICATE \"#{@proxy.pass}\"") { |c| throw "cannot authenticate to Tor!" if c != "250 OK\n" }
+      localhost.cmd("AUTHENTICATE \"#{@proxy.password}\"") { |c| throw "cannot authenticate to Tor!" if c != "250 OK\n" }
       localhost.cmd('signal NEWNYM') { |c| throw "cannot switch Tor to new route!" if c != "250 OK\n" }
       localhost.close
 
@@ -65,7 +66,7 @@ module TorPrivoxy
     end
 
     def set_mechanize_proxy
-      @mechanize.set_proxy(@proxy.host, @proxy.port.to_i)
+      @mechanize.set_proxy(@proxy.host, @proxy.privoxy_port.to_i)
     end
 
     def set_capybara_proxy
@@ -74,9 +75,9 @@ module TorPrivoxy
       @selenium_profile["network.proxy.type"] = 1
       @selenium_profile["network.proxy.http"] = @proxy.host
       @selenium_profile["network.proxy.ssl"] = @proxy.host
-      @selenium_profile["network.proxy.http_port"] = @proxy.port.to_i
+      @selenium_profile["network.proxy.http_port"] = @proxy.privoxy_port.to_i
 
-      @webkit_browser.set_proxy(host: @proxy.host, port: @proxy.port.to_i) unless @webkit_browser.nil?
+      @webkit_browser.set_proxy(host: @proxy.host, port: @proxy.privoxy_port.to_i) unless @webkit_browser.nil?
     end
 
     def register_capybara_drivers
